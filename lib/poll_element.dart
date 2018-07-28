@@ -47,9 +47,6 @@ class _MyPollElement extends State<PollElement> {
       //crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Column(
-//          mainAxisSize: MainAxisSize.min,
-//          mainAxisAlignment: MainAxisAlignment.end,
-//          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             new Text(
               widget.poll,
@@ -58,9 +55,6 @@ class _MyPollElement extends State<PollElement> {
           ],
         ),
         Column(
-//          mainAxisSize: MainAxisSize.min,
-//          mainAxisAlignment: MainAxisAlignment.end,
-//          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CounterActionButton(
                 onPressed: onIncrementCounter,

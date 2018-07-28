@@ -2,11 +2,8 @@ import 'package:boe/search_bar.dart';
 import 'package:flutter/material.dart';
 
 class PollManager extends StatelessWidget {
-  void _handleSearchBegin() {}
-
-  @override
   Widget build(BuildContext context) {
-    var divHeight = MediaQuery.of(context).size.height;
+    //var divHeight = MediaQuery.of(context).size.height;
     return new Scaffold(
       body: new Container(
         child: new Column(

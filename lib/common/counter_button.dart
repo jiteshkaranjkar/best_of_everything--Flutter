@@ -11,7 +11,6 @@ class CounterActionButton extends StatefulWidget {
 }
 
 class _MyCounterActionButton extends State<CounterActionButton> {
-  int count = 1;
   @override
   Widget build(BuildContext context) {
     return Column(

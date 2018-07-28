@@ -12,8 +12,7 @@ class PollControl extends StatelessWidget {
     "Juice",
     "Shake",
     "Milk",
-    "Water",
-    "Vodka"
+    "Water"
   ];
 
   @override

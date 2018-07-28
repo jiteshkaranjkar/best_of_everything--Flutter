@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 //import 'package:firebase_database/firebase_database.dart';
 
 class Counter {
-  Counter({this.id, this.value});
-  int id;
-  int value;
+  Counter({this.name, this.inc, this.dec});
+  String name;
+  int inc;
+  int dec;
 }
 
 abstract class Database {
@@ -32,6 +33,14 @@ class _PollsFireStoreState extends State<PollsFireStore> {
 
   @override
   Widget build(BuildContext context) {
+    Map<int, int> mapCounter = <int, int>{0: 2, 1: 5};
+    Map<String, Map<int, int>> mapPoll = <String, Map<int, int>>{
+      "Tea": mapCounter
+    };
+
+    documentReference.setData(mapPoll).whenComplete(() {
+      print("aslkfjas");
+    }).catchError((e) => print("Error $e"));
     return Container();
   }
 }

@@ -1,3 +1,4 @@
+import 'package:boe/database.dart';
 import 'package:boe/poll_control.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +12,9 @@ class SearchBar extends StatefulWidget {
 class _SearchBarState extends State<SearchBar> {
   final _SearchBarSearchDelegate _delegate = new _SearchBarSearchDelegate();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  void _handleSearchBegin() {}
+  void _handleSearchBegin() {
+    PollsFireStore();
+  }
 
   int _lastIntegerSelected;
 
