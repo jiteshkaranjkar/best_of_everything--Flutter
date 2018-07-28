@@ -63,11 +63,6 @@ class _SearchBarState extends State<SearchBar> {
             onPressed: _handleSearchBegin,
             tooltip: 'Search',
           ),
-//          IconButton(
-//            icon: const Icon(Icons.account_circle),
-//            onPressed: _handleSearchBegin,
-//            tooltip: 'Search',
-//          ),
           IconButton(
             icon: const Icon(
               Icons.settings,

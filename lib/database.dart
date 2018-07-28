@@ -40,7 +40,7 @@ class _PollsFireStoreState extends State<PollsFireStore> {
 
     documentReference.setData(mapPoll).whenComplete(() {
       print("aslkfjas");
-    }).catchError((e) => print("Error $e"));
+    }).catchError((err) => print("Error $err"));
     return Container();
   }
 }

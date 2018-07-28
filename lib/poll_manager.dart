@@ -38,14 +38,6 @@ class PollManager extends StatelessWidget {
             Column(children: <Widget>[
               SearchBar(),
             ]),
-//            Column(
-//              children: [
-//                Padding(
-//                  padding: const EdgeInsets.all(20.0),
-//                  child: PollControl(),
-//                ),
-//              ],
-//            )
           ],
         ),
       ),

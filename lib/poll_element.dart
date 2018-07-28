@@ -3,23 +3,7 @@ import 'package:flutter/material.dart';
 
 class PollElement extends StatefulWidget {
   final String poll;
-
   PollElement({Key key, this.poll}) : super(key: key);
-//  final Counter counter;
-//
-//  final ValueChanged<Counter> onDecrementCounter;
-//  final ValueChanged<Counter> onIncrementCounter;
-//  final ValueChanged<Counter> onDismissed;
-//
-//  PollElement(
-//      {Key key,
-//      this.poll,
-//      this.counter,
-//      this.onDecrement,
-//      this.onIncrement,
-//      this.onDismissed})
-//      : super(key: key);
-
   @override
   _MyPollElement createState() => new _MyPollElement();
 }
@@ -27,6 +11,7 @@ class PollElement extends StatefulWidget {
 class _MyPollElement extends State<PollElement> {
   int _incCounter = 0;
   int _decCounter = 0;
+
   onDecrementCounter() {
     setState(() {
       _decCounter--;

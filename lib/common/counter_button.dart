@@ -16,7 +16,7 @@ class _MyCounterActionButton extends State<CounterActionButton> {
     return Column(
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+          padding: const EdgeInsets.only(left: 20.0, right: 20.0),
           child: Column(
             children: [
               new FloatingActionButton(

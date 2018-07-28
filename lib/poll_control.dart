@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import './poll_element.dart';
 
 class PollControl extends StatelessWidget {
-  //PollControl({this.database, this.stream});
-  //final Database database;
-  //final Stream<List<Counter>> stream;
   final List<String> strList = [
     "Tea",
     "Coffee",

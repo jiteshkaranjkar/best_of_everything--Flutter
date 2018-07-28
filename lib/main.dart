@@ -10,7 +10,7 @@ class PollApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
         //brightness: Brightness.light,
-        primaryColor: Colors.lightBlue[800],
+        //primaryColor: Colors.lightBlue[800],
         accentColor: Colors.cyan[200],
       ),
       home: Scaffold(
