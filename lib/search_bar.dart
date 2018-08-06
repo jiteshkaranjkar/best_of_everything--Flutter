@@ -1,5 +1,5 @@
-import 'package:boe/database.dart';
 import 'package:boe/poll_control.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class SearchBar extends StatefulWidget {
@@ -10,10 +10,23 @@ class SearchBar extends StatefulWidget {
 }
 
 class _SearchBarState extends State<SearchBar> {
+  final DocumentReference documentReference =
+      Firestore.instance.document('Polls');
+  final CollectionReference collectionReference =
+      Firestore.instance.collection('Polls');
   final _SearchBarSearchDelegate _delegate = new _SearchBarSearchDelegate();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   void _handleSearchBegin() {
-    PollsFireStore();
+    Map<String, String> mapCounter = <String, String>{"Inc": "2", "Dec": "-5"};
+    Map<String, Map<String, String>> mapPoll = <String, Map<String, String>>{
+      "Sahke": mapCounter
+    };
+    //Map<String, String> mapPoll = <String, String>{"Coffee": "2"};
+
+    collectionReference.add(mapPoll).whenComplete(() {
+      print("Poll collectionReference");
+    }).catchError((err) => print("CR Error - $err"));
   }
 
   int _lastIntegerSelected;
@@ -85,47 +98,6 @@ class _SearchBarState extends State<SearchBar> {
         padding: const EdgeInsets.all(20.0),
         child: PollControl(),
       ),
-//      body: new Center(
-//        child: new Column(
-//          mainAxisAlignment: MainAxisAlignment.center,
-//          children: <Widget>[
-//            new MergeSemantics(
-//              child: new Column(
-//                mainAxisAlignment: MainAxisAlignment.center,
-//                children: <Widget>[
-//                  new Row(
-//                    mainAxisAlignment: MainAxisAlignment.center,
-//                    children: const <Widget>[
-//                      const Text('Press the '),
-//                      const Tooltip(
-//                        message: 'search',
-//                        child: const Icon(
-//                          Icons.search,
-//                          size: 18.0,
-//                        ),
-//                      ),
-//                      const Text(' icon in the AppBar'),
-//                    ],
-//                  ),
-//                  const Text(
-//                      'and search for an integer between 0 and 100,000.'),
-//                ],
-//              ),
-//            ),
-//            const SizedBox(height: 64.0),
-//            new Text(
-//                'Last selected integer: ${_lastIntegerSelected ?? 'NONE' }.')
-//          ],
-//        ),
-//      ),
-//      floatingActionButton: new FloatingActionButton.extended(
-//        tooltip: 'Back', // Tests depend on this label to exit the demo.
-//        onPressed: () {
-//          Navigator.of(context).pop();
-//        },
-//        label: const Text('Close demo'),
-//        icon: const Icon(Icons.close),
-//      ),
       drawer: new Drawer(
         child: new Column(
           children: <Widget>[
@@ -148,6 +120,27 @@ class _SearchBarState extends State<SearchBar> {
                 leading: const Icon(Icons.payment),
                 title: const Text('Placeholder'),
               ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {},
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: new Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.menu),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {},
             ),
           ],
         ),

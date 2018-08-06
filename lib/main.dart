@@ -1,5 +1,6 @@
 import 'package:boe/search_bar.dart';
 import 'package:flutter/material.dart';
+//import 'package:boe/crud.dart';
 
 void main() => runApp(new PollApp());
 
@@ -9,12 +10,12 @@ class PollApp extends StatelessWidget {
     return new MaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
-        //brightness: Brightness.light,
-        //primaryColor: Colors.lightBlue[800],
+        brightness: Brightness.light,
+        primaryColor: Colors.lightBlue[800],
         accentColor: Colors.cyan[200],
       ),
       home: Scaffold(
-        body: SearchBar(),
+        body: SearchBar(), //CrudSample(), //SearchBar(),
       ),
     );
   }

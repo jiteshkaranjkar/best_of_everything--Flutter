@@ -6,7 +6,7 @@ dependencies:
     sdk: flutter
 #  google_sign_in: ^3.0.4
   firebase_auth: ^0.5.15
-#  firebase_database: ^1.0.3
+  firebase_database: ^1.0.3
   cloud_firestore: ^0.7.4
 #  scoped_model: ^0.2.0
 #  redux: ^3.0.0

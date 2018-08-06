@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-//import 'package:firebase_database/firebase_database.dart';
 
 class Counter {
   Counter({this.name, this.inc, this.dec});
@@ -15,21 +15,36 @@ abstract class Database {
   Future<void> addCounter();
   Future<void> setCounter(Counter counter);
   Future<void> deleteCounter(Counter counter);
-  Stream<List<Counter>> countersStream();
+  //Stream<List<Counter>> countersStream();
+  Stream<QuerySnapshot> pollsStream();
+  DocumentReference pollsData();
+  CollectionReference _collectionReference(Counter counter);
+  String getPollsTitle();
 }
 
 class PollsFireStore extends StatefulWidget {
+  final String poll;
+  PollsFireStore({Key key, this.poll}) : super(key: key);
   @override
   _PollsFireStoreState createState() => _PollsFireStoreState();
 }
 
 class _PollsFireStoreState extends State<PollsFireStore> {
+  String myText;
+//  StreamSubscription<DocumentSnapshot> subscription;
+
   final DocumentReference documentReference =
-      Firestore.instance.document('Polls');
+      Firestore.instance.document('Polls'); //'Polls/MorningDrink'
   final CollectionReference collectionReference =
       Firestore.instance.collection('Polls');
   final Stream<QuerySnapshot> streamQuerySnapshot =
       Firestore.instance.collection('Polls').snapshots();
+
+  @override
+  void initState() {
+    print(widget.poll);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,52 +60,77 @@ class _PollsFireStoreState extends State<PollsFireStore> {
   }
 }
 
-//class FireDatabase implements Database {
-//  Future<void> addCounter() async {
-//    int now = DateTime.now().millisecondsSinceEpoch;
-//    Counter counter = new Counter(id: now, value: 0);
-//    await setCounter(counter);
-//  }
-//
-//  Future<void> setCounter(Counter counter) async {
-//    DatabaseReference databaseReference = _databaseReference(counter);
-//    await databaseReference.set(counter.value);
-//  }
-//
-//  Future<void> deleteCounter(Counter counter) async {
-//    DatabaseReference databaseReference = _databaseReference(counter);
-//    await databaseReference.remove();
-//  }
-//
-//  DatabaseReference _databaseSnapsho(Counter counter) {
-//    var path = '$rootPath/${counter.id}';
-//    return Firestore.instance.collection('Polls').snapshots();
-//  }
-//
+class FireDatabase implements Database {
+  DocumentReference documentReference;
+  FireDatabase() {
+    documentReference = Firestore.instance.document('Polls/MorningDrink');
+  }
+
+  Future<void> addCounter() async {
+    //int now = DateTime.now().millisecondsSinceEpoch;
+    Counter counter = new Counter(name: "PollItem", inc: 0, dec: 0);
+    await setCounter(counter);
+  }
+
+  Future<void> setCounter(Counter counter) async {
+    CollectionReference collectionReference = _collectionReference(counter);
+    //await collectionReference.set(counter.value);
+  }
+
+  Future<void> deleteCounter(Counter counter) async {
+    CollectionReference collectionReference = _collectionReference(counter);
+//    await collectionReference.remove();
+  }
+
+  CollectionReference _collectionReference(Counter counter) {
+    //var path = '$rootPath/${counter.id}';
+    return Firestore.instance.collection('Polls'); // .snapshots();
+  }
+
+  Stream<QuerySnapshot> pollsStream() {
+    return Firestore.instance.collection('Polls').snapshots();
+  }
+
+  String getPollsTitle() {
+    documentReference.get().then((dataSnapshot) {
+      if (dataSnapshot.exists) {
+        return dataSnapshot.data['title'];
+      } else {
+        return "No Data Found";
+      }
+    });
+    return "";
+  }
+
+  DocumentReference pollsData() {
+    return Firestore.instance.collection('Polls').document('MorningDrink');
+  }
+
 //  Stream<List<Counter>> countersStream() {
-//    return _DatabaseStream<List<Counter>>(
-//      apiPath: rootPath,
-//      parser: _DatabaseCountersParser(),
-//    ).stream;
+////    return _DatabaseStream<List<Counter>>(
+////      apiPath: rootPath,
+////      parser: _DatabaseCountersParser(),
+////    ).stream;
 //  }
-//
-//  static final String rootPath = 'counters';
-//}
+
+  static final String rootPath = 'counters';
+}
 //
 //class _DatabaseStream<T> {
 //  _DatabaseStream({String apiPath, DatabaseNodeParser<T> parser}) {
-//    Firestore firestore = Firestore.instance;
-//    DatabaseReference databaseReference = firestore.reference().child(apiPath);
-//    var eventStream = databaseReference.onValue;
-//    stream = eventStream.map((event) => parser.parse(event));
+//    Firestore firestoreInstance = Firestore.instance;
+//    CollectionReference collectionReference =
+//        firestoreInstance.collection('Polls');
+//    var eventStream = collectionReference.snapshots();
+//    stream = eventStream.map((event) => parser.parse(eventStream));
 //  }
 //
 //  Stream<T> stream;
 //}
-//
-//abstract class DatabaseNodeParser<T> {
-//  T parse(Event event);
-//}
+
+abstract class DatabaseNodeParser<T> {
+  T parse(Event event);
+}
 //
 //class _DatabaseCountersParser implements DatabaseNodeParser<List<Counter>> {
 //  List<Counter> parse(Event event) {
