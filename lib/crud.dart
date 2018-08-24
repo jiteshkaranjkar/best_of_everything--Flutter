@@ -138,7 +138,7 @@ class CrudSampleState extends State<CrudSample> {
 //            addItemvalue == null
 //                ? new Container()
 //                :
-            AddPollItem(handleAdd: _add, addItemName: addItemvalue),
+            AddPollItem(),
 //                : new Text(
 //                    myText,
 //                    style: new TextStyle(fontSize: 20.0),

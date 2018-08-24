@@ -1,38 +1,156 @@
-import 'package:boe/poll_control.dart';
+//import 'package:boe/display_poll_items.dart';
+import 'package:boe/display_polls.dart';
+import 'package:boe/poll.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class SearchBar extends StatefulWidget {
+//import 'package:boe/poll_list_element.dart';
+
+class PollContainer extends StatefulWidget {
+  List<DocumentSnapshot> documents;
+  List<String> lstDocumentIds;
+  List<PollItem> lstPollItems;
+  List<Polls> lstPolls;
+
+  PollContainer(
+      {Key key,
+      //this.documents,
+      this.lstDocumentIds,
+      //this.lstPollItems,
+      this.lstPolls})
+      : super(key: key);
   static const String routeName = '/material/search';
 
   @override
-  _SearchBarState createState() => new _SearchBarState();
+  _PollContainerState createState() => new _PollContainerState();
 }
 
-class _SearchBarState extends State<SearchBar> {
-  final DocumentReference documentReference =
-      Firestore.instance.document('Polls');
-  final CollectionReference collectionReference =
-      Firestore.instance.collection('Polls');
+class _PollContainerState extends State<PollContainer> {
   final _SearchBarSearchDelegate _delegate = new _SearchBarSearchDelegate();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  void _handleSearchBegin() {
-    Map<String, String> mapCounter = <String, String>{"Inc": "2", "Dec": "-5"};
-    Map<String, Map<String, String>> mapPoll = <String, Map<String, String>>{
-      "Sahke": mapCounter
-    };
-    //Map<String, String> mapPoll = <String, String>{"Coffee": "2"};
+  String pollDocumentId;
 
-    collectionReference.add(mapPoll).whenComplete(() {
-      print("Poll collectionReference");
-    }).catchError((err) => print("CR Error - $err"));
+  void _handleSearchBegin() {
+//    Map<String, String> mapCounter = <String, String>{"Inc": "2", "Dec": "-5"};
+//    Map<String, Map<String, String>> mapPoll = <String, Map<String, String>>{
+//      "Shake": mapCounter
+//    };
+//
+//    collectionReference.add(mapPoll).whenComplete(() {
+//      print("Poll collectionReference");
+//    }).catchError((err) => print("CR Error - $err"));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  onPollchnaged() {
+    widget.documents.map((DocumentSnapshot docSnapshot) {
+      if (docSnapshot.exists) {
+        widget.lstDocumentIds.add(docSnapshot.documentID);
+      }
+    }).toList();
+  }
+
+//  _fetch() {
+////    widget.documents.map((DocumentSnapshot docSnapshot) {
+////      if (docSnapshot.exists) {
+////        widget.lstDocumentIds.add(docSnapshot.documentID);
+////      }
+////    }).toList();
+////    widget.lstDocumentIds.removeAt(1);
+////    widget.lstDocumentIds.removeAt(1);
+////    widget.lstDocumentIds.removeAt(1);
+////    widget.lstDocumentIds.removeAt(1);
+//    Polls polls;
+//    if (widget.lstDocumentIds != null) {
+//      widget.lstDocumentIds.forEach((docId) {
+//        if (pollDocumentId == null) pollDocumentId = docId;
+////        print(
+////            "------------------------------------------------------------- #### Jabsdkjf K 1 #### -------------------${docId}");
+//        Firestore.instance.collection(docId).getDocuments().then((docs) {
+//          lstPollItems = new List<PollItem>();
+//          docs.documents.forEach((DocumentSnapshot docSnapshot) {
+//            if (docSnapshot.exists) {
+////              print("--- #### NJK 0 #### -----${docSnapshot.documentID} ");
+////              print("--- #### NJK 3 #### -----${docSnapshot.data['name']} " +
+////                  " --- " +
+////                  "${docSnapshot.data['inc']} " +
+////                  " --- " +
+////                  "${docSnapshot.data['dec']} ");
+//              lstPollItems.add(new PollItem(
+//                  docId,
+//                  docSnapshot.documentID,
+//                  docSnapshot.data['name'],
+//                  docSnapshot.data['inc'],
+//                  docSnapshot.data['dec'],
+//                  docSnapshot));
+//
+//              polls =
+//                  new Polls(docId, docSnapshot.documentID, lstPollItems, docId);
+//            }
+//          });
+//        });
+//        lstPolls.add(polls);
+//      });
+//    }
+////    else
+////      print(
+////          "------------------------------------------------------------- ------------------------------------------------------------- #### NULL #### -------------------------------------------------------------------------------- ");
+//  }
+//  _fetchSelectedPollItems(String selectedPoll) {
+//    print(
+//        "------------------------------------------------------------- #### Jabsdkjf K 1 #### -------------------${selectedPoll}");
+//    Polls polls;
+//    Firestore.instance.collection(selectedPoll).getDocuments().then((docs) {
+//      docs.documents.forEach((DocumentSnapshot docSnapshot) {
+//        if (docSnapshot.exists) {
+//          print("--- #### JVK 0 #### -----${docSnapshot.documentID} ");
+//          print("--- #### JVK 3 #### -----${docSnapshot.data['name']} " +
+//              " --- " +
+//              "${docSnapshot.data['inc']} " +
+//              " --- " +
+//              "${docSnapshot.data['dec']} ");
+//          widget.lstPollItems.add(new PollItem(
+//              selectedPoll,
+//              docSnapshot.documentID,
+//              docSnapshot.data['name'],
+//              docSnapshot.data['inc'],
+//              docSnapshot.data['dec'],
+//              docSnapshot));
+//
+//          polls = new Polls(selectedPoll, lstPollItems, selectedPoll);
+//        }
+//      });
+//    });
+//    lstPolls.add(polls);
+//  }
+
+  _navigateAndDisplayDropDown(BuildContext context) async {
+//    final result = await Navigator.push(
+//      context,
+//      // We'll create the SelectionScreen in the next step!
+//      MaterialPageRoute(
+//          builder: (context) => PollDropDown(
+//              lstDocumentIds: widget.lstDocumentIds,
+//              pollDocumentId: pollDocumentId,
+//              docSnapshot: widget.documents,
+//              onPressed: onPollchnaged)),
+//    );
+//
+//    print("Result $result");
+//    _fetchSelectedPollItems(result);
   }
 
   int _lastIntegerSelected;
 
   @override
   Widget build(BuildContext context) {
+//    print(
+//        "------------------------------------------------------------- #### Jabsdkjf K 123 #### -------------------${widget.lstPolls.elementAt(0).name}");
     return new Scaffold(
       key: _scaffoldKey,
       appBar: new AppBar(
@@ -70,14 +188,6 @@ class _SearchBarState extends State<SearchBar> {
           ),
           IconButton(
             icon: const Icon(
-              Icons.add_box,
-              size: 18.0,
-            ),
-            onPressed: _handleSearchBegin,
-            tooltip: 'Search',
-          ),
-          IconButton(
-            icon: const Icon(
               Icons.settings,
               size: 18.0,
             ),
@@ -95,8 +205,21 @@ class _SearchBarState extends State<SearchBar> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: PollControl(),
+        padding: const EdgeInsets.all(10.0),
+//        child: new Column(
+//          children: widget.lstPolls
+//              .map((doc) => PollListElement(pollDocumentId: doc.name))
+//              .toList(),
+//        ),
+
+        child: DisplayPolls(
+          //documents: widget.documents,
+          lstDocumentIds: widget.lstDocumentIds,
+        ),
+//        child: DisplayPollItems(
+//            documents: widget.documents,
+//            lstDocumentIds: widget.lstDocumentIds,
+//            lstPollItems: widget.lstPollItems),
       ),
       drawer: new Drawer(
         child: new Column(
@@ -134,8 +257,16 @@ class _SearchBarState extends State<SearchBar> {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
+//            _navigateAndDisplayDropDown(context),
+//            PollDropDown(
+//                lstDocumentIds: widget.lstDocumentIds,
+//                pollDocumentId: pollDocumentId,
+//                docSnapshot: widget.documents,
+//                onPressed: onPollchnaged),
             IconButton(
-              icon: Icon(Icons.menu),
+              icon: Icon(
+                Icons.menu,
+              ),
               onPressed: () {},
             ),
             IconButton(
@@ -164,7 +295,7 @@ class _SearchBarSearchDelegate extends SearchDelegate<int> {
         progress: transitionAnimation,
       ),
       onPressed: () {
-        close(context, null);
+        close(context, 0);
       },
     );
   }
@@ -288,7 +419,9 @@ class _SuggestionList extends StatelessWidget {
       itemBuilder: (BuildContext context, int i) {
         final String suggestion = suggestions[i];
         return new ListTile(
-          leading: query.isEmpty ? const Icon(Icons.history) : const Icon(null),
+          leading: query.isEmpty
+              ? const Icon(Icons.history)
+              : const Icon(Icons.history),
           title: new RichText(
             text: new TextSpan(
               text: suggestion.substring(0, query.length),

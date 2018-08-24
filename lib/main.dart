@@ -1,6 +1,8 @@
-import 'package:boe/search_bar.dart';
+//import 'package:boe/search_bar.dart';
+import 'package:boe/display_poll_items.dart';
+import 'package:boe/poll_list_items.dart';
+import 'package:boe/poll_manager.dart';
 import 'package:flutter/material.dart';
-//import 'package:boe/crud.dart';
 
 void main() => runApp(new PollApp());
 
@@ -15,8 +17,13 @@ class PollApp extends StatelessWidget {
         accentColor: Colors.cyan[200],
       ),
       home: Scaffold(
-        body: SearchBar(), //CrudSample(), //SearchBar(),
+        body: PollManager(), //SearchBar(), //CrudSample(), //SearchBar(),
       ),
+      initialRoute: '/',
+      routes: <String, WidgetBuilder>{
+        '/PollPage': (BuildContext context) => new PollListItems(),
+        '/DisplayPollItems': (BuildContext context) => new DisplayPollItems(),
+      },
     );
   }
 }

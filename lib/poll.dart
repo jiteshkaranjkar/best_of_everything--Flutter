@@ -1,14 +1,24 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class PollItem {
-  String id;
+  String pollId;
+  String documentId;
   String name;
-  int inc;
-  int dec;
-  PollItem(this.id, this.name, this.inc, this.dec);
+  int inc = 0;
+  int dec = 0;
+  DocumentSnapshot docSnapshot;
+  PollItem(this.pollId, this.documentId, this.name, this.inc, this.dec,
+      this.docSnapshot);
 }
 
 class Polls {
-  String documentId;
-  String title;
-  List<PollItem> lstPollItems;
-  Polls(this.title, this.documentId, this.lstPollItems);
+  String pollId;
+//List<PollItem> lstPollItems;
+//  String id;
+  String name;
+//  String category;
+//  String subCategory;
+//  String createdBy;
+//  DateTime createdOn;
+  Polls(this.pollId, this.name);
 }

@@ -1,12 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class AddPollItem extends StatefulWidget {
-  final VoidCallback handleAdd;
-  String addItemName;
-  final String pollDocumentId;
+  //final VoidCallback handleAdd;
+//  String addItemName;
+//  final String pollDocumentId;
 
-  AddPollItem({Key key, this.handleAdd, this.addItemName, this.pollDocumentId})
-      : super(key: key);
+  AddPollItem({Key key}) : super(key: key);
 
   @override
   _AddPollItemState createState() {
@@ -18,42 +18,44 @@ enum FormType { addItem, addPoll }
 
 class _AddPollItemState extends State<AddPollItem> {
   final formKey = GlobalKey<FormState>();
-//  String _message = "Hello World";
-  FormType _formType = FormType.addItem;
-//  final TextEditingController _textItemAdd =
-//      new TextEditingController(text: "Add a item");
+  String poll;
 
-  bool loginSuccess() {
+  bool validate() {
     final form = formKey.currentState;
     if (form.validate()) {
       form.save();
-      print("Form is valid, Item : $widget.addItemName");
       return true;
     }
     return false;
   }
 
   void onAddItem() async {
-    if (loginSuccess()) {
-      try {
-        if (_formType == FormType.addItem) {
-          print("JK trying to Login --------------------$widget.addItemName ");
-//          String userId =
-//              await widget.auth.signInWithEmailAndPassword(_email, _password);
-//          print('$userId: Logged in successfully');
-//          _message = '$userId: Logged in successfully';
-        }
-        widget.handleAdd();
-        print("Yeppee Registered!");
-      } catch (err) {
-//        _message = 'Error - $err';
-        print('Login falied with error - $err');
-      }
+    try {
+      validate();
+      Firestore.instance.runTransaction((Transaction transaction) async {
+        CollectionReference reference = Firestore.instance.collection('Polls');
+
+        await reference.add({
+          "title": poll,
+          "name": poll,
+          "createdOn": DateTime.now(),
+          "createdBy": "JK",
+          "category": poll,
+          "subcategory": poll,
+        });
+      });
+      setState(() {
+        poll = "";
+      });
+      print('Logged in successfully');
+    } catch (err) {
+      print('Login falied with error - $err');
     }
   }
 
   @override
   void initState() {
+    poll = "";
     super.initState();
   }
 
@@ -69,12 +71,15 @@ class _AddPollItemState extends State<AddPollItem> {
               TextFormField(
                 decoration:
                     new InputDecoration(labelText: 'Add an entry to Poll'),
-                initialValue: "ForgetIt",
+//                initialValue: "ForgetIt",
                 validator: (value) =>
                     value.isEmpty ? 'Please enter some text' : null,
-                onSaved: (value) => widget.addItemName = value,
+                onSaved: (value) {
+                  setState(() {
+                    poll = value;
+                  });
+                },
 //                onSubmitted: _handleSubmitted,
-                //autofocus: true,
               ),
             ],
           ),
