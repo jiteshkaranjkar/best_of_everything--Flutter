@@ -16,7 +16,7 @@ class Polls {
 //List<PollItem> lstPollItems;
 //  String id;
   String name;
-//  String category;
+  String category;
 //  String subCategory;
 //  String createdBy;
 //  DateTime createdOn;

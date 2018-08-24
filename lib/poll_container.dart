@@ -1,9 +1,11 @@
-//import 'package:boe/display_poll_items.dart';
+import 'dart:async';
+
 import 'package:boe/display_polls.dart';
 import 'package:boe/poll.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+//import 'package:boe/display_poll_items.dart';
 //import 'package:boe/poll_list_element.dart';
 
 class PollContainer extends StatefulWidget {
@@ -28,6 +30,40 @@ class PollContainer extends StatefulWidget {
 class _PollContainerState extends State<PollContainer> {
   final _SearchBarSearchDelegate _delegate = new _SearchBarSearchDelegate();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final pollController = TextEditingController();
+  CollectionReference collectionReference;
+  String categoryselected;
+  List<String> lstCategory = [
+    'Software',
+    'Banks',
+    'Countries',
+    'Holiday places',
+    'Movie',
+    'Music',
+    'Poem',
+    'Book',
+    'Beverages',
+    'Insurance',
+    'Suburb',
+    'Brand',
+    'Laptop',
+  ];
+  List<String> lstSubCategory = [
+    'Software',
+    'Mortgage',
+    'Countries',
+    'Holiday places',
+    'Movie',
+    'Music',
+    'Poem',
+    'Book',
+    'Beverages',
+    'Insurance',
+    'Suburb',
+    'Brand',
+    'Laptop',
+  ];
+  Polls polls;
 
   String pollDocumentId;
 
@@ -248,21 +284,17 @@ class _PollContainerState extends State<PollContainer> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {},
+      floatingActionButton: FloatingActionButton.extended(
+        elevation: 4.0,
+        icon: const Icon(Icons.add),
+        label: const Text('Add Poll'),
+        onPressed: _showDialog,
       ),
       bottomNavigationBar: BottomAppBar(
         child: new Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-//            _navigateAndDisplayDropDown(context),
-//            PollDropDown(
-//                lstDocumentIds: widget.lstDocumentIds,
-//                pollDocumentId: pollDocumentId,
-//                docSnapshot: widget.documents,
-//                onPressed: onPollchnaged),
             IconButton(
               icon: Icon(
                 Icons.menu,
@@ -277,6 +309,124 @@ class _PollContainerState extends State<PollContainer> {
         ),
       ),
     );
+  }
+
+  _showDialog() async {
+    await showDialog<String>(
+      context: context,
+      child: new AlertDialog(
+        contentPadding: const EdgeInsets.all(16.0),
+        content: new Column(
+          children: <Widget>[
+            new Row(
+              children: <Widget>[
+                new Expanded(
+                  child: new TextField(
+                    controller: pollController,
+                    autofocus: true,
+                    decoration: new InputDecoration(
+                        labelText: 'Add Poll Item',
+                        hintText: 'eg. Butter milk'),
+                  ),
+                )
+              ],
+            ),
+            new Row(
+              children: <Widget>[
+                new Expanded(
+                  child: DropdownButton<String>(
+                    value: categoryselected,
+                    items: lstCategory.map((String value) {
+                      return new DropdownMenuItem(
+                        value: value,
+                        child: Row(
+                          children: <Widget>[
+                            Icon(Icons.home),
+                            Text(" ${value} ")
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (String value) {
+                      setState(() {
+                        categoryselected = value;
+                      });
+                    },
+                  ),
+                )
+              ],
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          new FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                pollController.text = "";
+                Navigator.pop(context);
+              }),
+          new FlatButton(
+              child: const Text('Add'),
+              onPressed: () {
+                setState(() {
+                  polls = new Polls("", "");
+                  print(
+                      "-${pollController.text}----------------- #### -6- #### -------------------");
+                });
+                onAddPoll();
+                Navigator.pop(context);
+              })
+        ],
+      ),
+    );
+  }
+
+  onAddPoll() {
+    print(
+        "------------------------------------------------------------- #### JK Poll 2#### ------------------");
+    CollectionReference collReference =
+        Firestore.instance.collection(pollController.text);
+    CollectionReference pollCollReference =
+        Firestore.instance.collection('Polls');
+
+    Firestore.instance.runTransaction((Transaction transaction) async {
+      await transaction.set(
+          pollCollReference.document(pollController.text.replaceAll(' ', '')), {
+        'name': pollController.text,
+        'pollId': pollController.text.replaceAll(' ', ''),
+        'category': ''
+      }).then((doc) {
+        showOverlay(context, 'Added', Colors.green);
+        print("Poll added ${pollController.text}");
+      }).catchError((error) {
+        showOverlay(context, '+1', Colors.red);
+        print("Poll adding Failed ${error}");
+      });
+      
+    await transaction.set(
+        collReference.document(pollController.text), ;
+    );  
+    });
+  }
+
+  showOverlay(BuildContext context, String msg, Color color) async {
+    OverlayState overlayState = Overlay.of(context);
+    OverlayEntry overlayEntry = OverlayEntry(
+        builder: (context) => Positioned(
+              top: 40.0,
+              right: 10.0,
+              child: FloatingActionButton(
+                onPressed: null,
+                backgroundColor: color,
+                foregroundColor: Colors.black,
+                child: Text(msg),
+              ),
+            ));
+    overlayState.insert(overlayEntry);
+
+    await Future.delayed(Duration(seconds: 4));
+
+    overlayEntry.remove();
   }
 }
 

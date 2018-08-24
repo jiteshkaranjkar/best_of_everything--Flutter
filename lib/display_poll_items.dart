@@ -194,39 +194,41 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
 //  }
 
   onDecrementCounter(DocumentSnapshot docSnapshot, String documentID) {
-    print(
-        "------------------------------------------------------------- #### JK dec 1#### ------------------${dec} -- ${docId} -- ${documentID}");
     setState(() {
       dec--;
     });
-    print(
-        "------------------------------------------------------------- #### JK dec 2#### ------------------${dec}-");
     collectionReference =
         Firestore.instance.collection(widget.selectedDocumentId);
     Firestore.instance.runTransaction((Transaction transaction) async {
       DocumentSnapshot snapshot =
           await transaction.get(collectionReference.document(documentID));
-      await transaction.update(snapshot.reference, {'dec': dec});
+      await transaction.update(snapshot.reference, {'dec': dec}).then((doc) {
+        showOverlay(context, '-1', Colors.green);
+        print("Decrement counter ${dec}");
+      }).catchError((error) {
+        showOverlay(context, '-1', Colors.red);
+        print("Decrement Failed ${error}");
+      });
     });
-    print("Decrement counter ${dec}");
   }
 
   onIncrementCounter(DocumentSnapshot docSnapshot, String documentID) {
-    print(
-        "------------------------------------------------------------- #### JK inc 1#### ------------------${inc}-");
     setState(() {
       inc++;
     });
-    print(
-        "------------------------------------------------------------- #### JK inc 2#### ------------------${inc}-- -- ${docId} -- ${documentID}--${widget.selectedDocumentId}");
     collectionReference =
         Firestore.instance.collection(widget.selectedDocumentId);
     Firestore.instance.runTransaction((Transaction transaction) async {
       DocumentSnapshot snapshot =
           await transaction.get(collectionReference.document(documentID));
-      await transaction.update(snapshot.reference, {'inc': inc});
+      await transaction.update(snapshot.reference, {'inc': inc}).then((doc) {
+        showOverlay(context, '+1', Colors.green);
+        print("Increment counter ${inc}");
+      }).catchError((error) {
+        showOverlay(context, '+1', Colors.red);
+        print("Increment Failed ${error}");
+      });
     });
-    print("Increment counter ${inc}");
   }
 
   onAddPollItem() {
@@ -235,10 +237,36 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
     collectionReference =
         Firestore.instance.collection(widget.selectedDocumentId);
     Firestore.instance.runTransaction((Transaction transaction) async {
-      //await transaction.get(
-      collectionReference.add({'name': pollItemName, 'inc': 0, 'dec': 0}); //);
+      await transaction.set(
+          collectionReference.document(pollItemName.replaceAll(' ', '')),
+          {'name': pollItemName, 'inc': 0, 'dec': 0}).then((doc) {
+        showOverlay(context, 'Added', Colors.green);
+        print("PollItem added ${pollItemName}");
+      }).catchError((error) {
+        showOverlay(context, '+1', Colors.red);
+        print("Poll adding Failed ${error}");
+      });
     });
-    print("Poll Item Added -  ${pollItemName}");
+  }
+
+  showOverlay(BuildContext context, String msg, Color color) async {
+    OverlayState overlayState = Overlay.of(context);
+    OverlayEntry overlayEntry = OverlayEntry(
+        builder: (context) => Positioned(
+              top: 40.0,
+              right: 10.0,
+              child: FloatingActionButton(
+                onPressed: null,
+                backgroundColor: color,
+                foregroundColor: Colors.black,
+                child: Text(msg),
+              ),
+            ));
+    overlayState.insert(overlayEntry);
+
+    await Future.delayed(Duration(seconds: 4));
+
+    overlayEntry.remove();
   }
 
   @override
@@ -374,7 +402,7 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
           title: new Text(widget.selectedDocumentId),
         ),
         body: Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.all(5.0),
           child: StreamBuilder<QuerySnapshot>(
             stream: Firestore.instance
                 .collection(widget.selectedDocumentId)
@@ -484,7 +512,7 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
                                 iconType: new Icon(
                                   Icons.thumb_up,
                                   color: Colors.white,
-                                  size: 18.0,
+                                  size: 15.0,
                                 ),
                                 tag: "Inc",
                                 counterNo: new Text(
@@ -508,13 +536,44 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
                                 iconType: new Icon(
                                   Icons.thumb_down,
                                   color: Colors.red,
-                                  size: 18.0,
+                                  size: 15.0,
                                 ),
                                 tag: "Dec",
                                 counterNo: new Text(
                                     '${docSnapshot['dec'].toString()}',
                                     style:
                                         Theme.of(context).textTheme.headline)),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.delete, size: 20.0),
+                              onPressed: () {
+                                DocumentReference docReference = Firestore
+                                    .instance
+                                    .collection(widget.selectedDocumentId)
+                                    .document(docSnapshot.documentID);
+
+                                print(
+                                    "-${docSnapshot.documentID}----------------- #### -9- #### ------${widget.selectedDocumentId}-------------");
+                                Firestore.instance.runTransaction(
+                                    (Transaction transaction) async {
+                                  print(
+                                      "-${docSnapshot['name']}----------------- #### -9- #### ------${widget.selectedDocumentId}-------------");
+
+                                  await transaction
+                                      .delete(docReference)
+                                      .then((doc) {
+                                    print("-${docReference
+                                            .toString()}----------------- #### -11- #### -------------------");
+                                  }).catchError((onError) {
+                                    print("-${docReference
+                                            .toString()}----------------- #### -Error - #### -------------------");
+                                  });
+                                });
+                              },
+                            ),
                           ],
                         ),
                       ],
@@ -525,36 +584,30 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
             },
           ),
         ),
-//        bottomNavigationBar: BottomAppBar(
-//            child: new Row(
-//          mainAxisSize: MainAxisSize.max,
-//          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//          children: <Widget>[
-//            new TextField(
-//              controller: pollItemController,
-//              onChanged: (String value) {
-//                //_handleSubmitted(value);
-//              },
-//              //onSubmitted: (){},
-//              decoration: InputDecoration(
-//                  //border: InputBorder.none,
-//                  hintText: 'Add an entry for Poll',
-//                  labelText: "Hello World"),
-//              style: Theme.of(context).textTheme.headline,
-//              autofocus: false,
-//            ),
-//            IconButton(
-//              icon: Icon(
-//                Icons.add,
-//              ),
-//              onPressed: () {},
-//            ),
-//          ],
-//        )),
+        bottomNavigationBar: BottomAppBar(
+          child: new Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                icon: Icon(
+                  Icons.menu,
+                ),
+                onPressed: () {},
+              ),
+              IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () {},
+              ),
+            ],
+          ),
+        ),
 
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
+        floatingActionButton: FloatingActionButton.extended(
+          elevation: 4.0,
+          icon: const Icon(Icons.add),
+          label: const Text('Add item'),
           onPressed: _showDialog,
         ),
 //        floatingActionButton: FloatingActionButton(
@@ -613,20 +666,5 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
         ],
       ),
     );
-  }
-}
-
-class _SystemPadding extends StatelessWidget {
-  final Widget child;
-
-  _SystemPadding({Key key, this.child}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    var mediaQuery = MediaQuery.of(context);
-    return new AnimatedContainer(
-        padding: mediaQuery.viewInsets,
-        duration: const Duration(milliseconds: 300),
-        child: child);
   }
 }
