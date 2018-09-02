@@ -13,10 +13,7 @@ class DisplayPollItems extends StatefulWidget {
 
   DisplayPollItems(
       {Key key, this.selectedDocumentId}) //this.documents, this.lstPollItems})
-      : super(key: key) {
-    print(
-        "-${selectedDocumentId}----------------- #### -1- #### -------------------");
-  }
+      : super(key: key);
 
   @override
   _DisplayPollItemsState createState() => _DisplayPollItemsState();
@@ -38,6 +35,12 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
   Curve _curve = Curves.easeOut;
   bool isOpened = false;
   final pollItemController = TextEditingController();
+
+  @override
+  void dispose() {
+    pollItemController.dispose();
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() {
@@ -204,10 +207,10 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
           await transaction.get(collectionReference.document(documentID));
       await transaction.update(snapshot.reference, {'dec': dec}).then((doc) {
         showOverlay(context, '-1', Colors.green);
-        print("Decrement counter ${dec}");
+        print("Decrement counter $dec");
       }).catchError((error) {
         showOverlay(context, '-1', Colors.red);
-        print("Decrement Failed ${error}");
+        print("Decrement Failed $error");
       });
     });
   }
@@ -223,17 +226,15 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
           await transaction.get(collectionReference.document(documentID));
       await transaction.update(snapshot.reference, {'inc': inc}).then((doc) {
         showOverlay(context, '+1', Colors.green);
-        print("Increment counter ${inc}");
+        print("Increment counter $inc");
       }).catchError((error) {
         showOverlay(context, '+1', Colors.red);
-        print("Increment Failed ${error}");
+        print("Increment Failed $error");
       });
     });
   }
 
   onAddPollItem() {
-    print(
-        "------------------------------------------------------------- #### JK inc 2#### ------------------${inc}-- -- ${pollItemName} --${widget.selectedDocumentId}");
     collectionReference =
         Firestore.instance.collection(widget.selectedDocumentId);
     Firestore.instance.runTransaction((Transaction transaction) async {
@@ -241,10 +242,10 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
           collectionReference.document(pollItemName.replaceAll(' ', '')),
           {'name': pollItemName, 'inc': 0, 'dec': 0}).then((doc) {
         showOverlay(context, 'Added', Colors.green);
-        print("PollItem added ${pollItemName}");
+        print("PollItem added $pollItemName");
       }).catchError((error) {
         showOverlay(context, '+1', Colors.red);
-        print("Poll adding Failed ${error}");
+        print("Poll adding Failed $error");
       });
     });
   }
@@ -400,6 +401,11 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
       home: Scaffold(
         appBar: new AppBar(
           title: new Text(widget.selectedDocumentId),
+//          leading: IconButton(
+//              icon: Icon(Icons.arrow_back, size: 20.0),
+//              onPressed: () {
+//                Navigator.of(context).pop();
+//              }),
         ),
         body: Padding(
           padding: const EdgeInsets.all(5.0),
@@ -502,8 +508,8 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
                             CounterActionButton(
                                 onPressed: () {
                                   setState(() {
-                                    inc = int
-                                        .parse(docSnapshot['inc'].toString());
+                                    inc = int.parse(
+                                        docSnapshot['inc'].toString());
                                     docId = docSnapshot['name'];
                                   });
                                   onIncrementCounter(
@@ -526,8 +532,8 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
                             CounterActionButton(
                                 onPressed: () {
                                   setState(() {
-                                    dec = int
-                                        .parse(docSnapshot['dec'].toString());
+                                    dec = int.parse(
+                                        docSnapshot['dec'].toString());
                                     docId = docSnapshot['name'];
                                   });
                                   onDecrementCounter(
@@ -554,22 +560,14 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
                                     .instance
                                     .collection(widget.selectedDocumentId)
                                     .document(docSnapshot.documentID);
-
-                                print(
-                                    "-${docSnapshot.documentID}----------------- #### -9- #### ------${widget.selectedDocumentId}-------------");
                                 Firestore.instance.runTransaction(
                                     (Transaction transaction) async {
-                                  print(
-                                      "-${docSnapshot['name']}----------------- #### -9- #### ------${widget.selectedDocumentId}-------------");
-
                                   await transaction
                                       .delete(docReference)
-                                      .then((doc) {
-                                    print("-${docReference
-                                            .toString()}----------------- #### -11- #### -------------------");
-                                  }).catchError((onError) {
-                                    print("-${docReference
-                                            .toString()}----------------- #### -Error - #### -------------------");
+                                      .then((doc) {})
+                                      .catchError((onError) {
+                                    print(
+                                        "-${docReference.toString()}----------------- #### -Error - #### -------------------");
                                   });
                                 });
                               },
@@ -640,7 +638,8 @@ class _DisplayPollItemsState extends State<DisplayPollItems> {
                 controller: pollItemController,
                 autofocus: true,
                 decoration: new InputDecoration(
-                    labelText: 'Add Poll Item', hintText: 'eg. Butter milk'),
+                    labelText: 'Add Poll Item',
+                    hintText: 'eg. your Favourite gadget'),
               ),
             )
           ],

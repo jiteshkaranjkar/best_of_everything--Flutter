@@ -1,3 +1,6 @@
+//import 'package:boe/common/grid_view_cards.dart';
+import 'dart:async';
+
 import 'package:boe/poll.dart';
 import 'package:boe/poll_container.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,13 +12,22 @@ class PollManager extends StatelessWidget {
   String pollDocumentId;
   List<PollItem> lstPollItems = new List<PollItem>();
   Map<String, String> mapPollDetails = new Map<String, String>();
+  List<String> lstPollImages = new List<String>();
 
-  _fetchPolls(List<DocumentSnapshot> lstDocSnapshot) {
+  _fetchPollImages() {
+    Firestore.instance.collection('Polls').getDocuments().then((docs) {
+      docs.documents.forEach((DocumentSnapshot docSnapshot) {
+        if (!lstPollImages.contains(docSnapshot.data['image']))
+          lstPollImages.add(docSnapshot.data['image']);
+      });
+    });
+  }
+
+  Future _fetchPolls(List<DocumentSnapshot> lstDocSnapshot) {
     lstDocSnapshot.forEach((DocumentSnapshot docSnapshot) {
       if (!lstDocumentIds.contains(docSnapshot.documentID))
         lstDocumentIds.add(docSnapshot.documentID);
-      lstPolls
-          .add(new Polls(docSnapshot.data["name"], docSnapshot.data["title"]));
+      //lstPolls.add(new Polls(docSnapshot.data["name"], "", "", ""));
     });
   }
 //  _fetchPolls() async {
@@ -128,26 +140,25 @@ class PollManager extends StatelessWidget {
 //  }
 
   Widget build(BuildContext context) {
-//    _fetchPolls();
+    _fetchPollImages();
     return new Scaffold(
       body: StreamBuilder(
-        stream: Firestore.instance.collection('Polls').snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData) {
-            return CircularProgressIndicator();
-          } else {
-            if (snapshot.data.documents != null) {
-              _fetchPolls(snapshot.data.documents);
-              return PollContainer(
-                  //documents: snapshot.data.documents,
-                  lstDocumentIds: lstDocumentIds,
-                  //lstPollItems: lstPollItems,
-                  lstPolls: lstPolls);
-//              }
+          stream: Firestore.instance.collection('Polls').snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (!snapshot.hasData) {
+              return CircularProgressIndicator();
+            } else {
+              if (snapshot.data.documents != null) {
+                _fetchPolls(snapshot.data.documents);
+                return PollContainer(
+                    lstPollImages: lstPollImages,
+                    lstDocumentIds: lstDocumentIds,
+                    //lstPollItems: lstPollItems,
+                    lstPolls: lstPolls);
+              }
             }
-          }
-        },
-      ),
+          }),
     );
   }
 }

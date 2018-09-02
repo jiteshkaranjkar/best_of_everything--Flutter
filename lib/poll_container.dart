@@ -1,22 +1,22 @@
 import 'dart:async';
 
-import 'package:boe/display_polls.dart';
+import 'package:boe/display_poll_items.dart';
 import 'package:boe/poll.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+//import 'package:boe/pollcard.dart';
 
-//import 'package:boe/display_poll_items.dart';
 //import 'package:boe/poll_list_element.dart';
 
 class PollContainer extends StatefulWidget {
-  List<DocumentSnapshot> documents;
+  List<String> lstPollImages;
   List<String> lstDocumentIds;
   List<PollItem> lstPollItems;
   List<Polls> lstPolls;
 
   PollContainer(
       {Key key,
-      //this.documents,
+      this.lstPollImages,
       this.lstDocumentIds,
       //this.lstPollItems,
       this.lstPolls})
@@ -29,10 +29,11 @@ class PollContainer extends StatefulWidget {
 
 class _PollContainerState extends State<PollContainer> {
   final _SearchBarSearchDelegate _delegate = new _SearchBarSearchDelegate();
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+//  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final pollController = TextEditingController();
   CollectionReference collectionReference;
   String categoryselected;
+  List<String> lstPollImages = new List<String>();
   List<String> lstCategory = [
     'Software',
     'Banks',
@@ -54,7 +55,6 @@ class _PollContainerState extends State<PollContainer> {
     'Countries',
     'Holiday places',
     'Movie',
-    'Music',
     'Poem',
     'Book',
     'Beverages',
@@ -66,6 +66,257 @@ class _PollContainerState extends State<PollContainer> {
   Polls polls;
 
   String pollDocumentId;
+
+  int _lastIntegerSelected;
+
+//  _fetchPollImges() async {
+//    await Firestore.instance.collection('Polls').getDocuments().then((docs) {
+//      docs.documents.forEach((DocumentSnapshot docSnapshot) {
+//        if (!lstPollImages.contains(docSnapshot.data['image']))
+//          lstPollImages.add(docSnapshot.data['image']);
+//      });
+//    });
+//  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      drawer: Drawer(
+        // Add a ListView to the drawer. This ensures the user can scroll
+        // through the options in the Drawer if there isn't enough vertical
+        // space to fit everything.
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text('Drawer Header'),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              title: Text('Item 1'),
+              onTap: () {
+                // Update the state of the app
+                // ...
+                // Then close the drawer
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('Item 2'),
+              onTap: () {
+                // Update the state of the app
+                // ...
+                // Then close the drawer
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+      body: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return <Widget>[
+            SliverAppBar(
+              expandedHeight: 250.0,
+              floating: false,
+              pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                centerTitle: true,
+                background:
+                    Image.asset('res/images/HomeImage.jpeg', fit: BoxFit.cover),
+              ),
+//              leading: new IconButton(
+//                tooltip: 'Navigation menu',
+//                icon: new AnimatedIcon(
+//                  icon: AnimatedIcons.menu_arrow,
+//                  size: 20.0,
+//                  color: Colors.white,
+//                  progress: _delegate.transitionAnimation,
+//                ),
+//                onPressed: () {
+//                  _scaffoldKey.currentState.openDrawer();
+//                },
+//              ),
+              title: const Text(
+                'the best of EVERYTHING',
+                //style: Theme.of(context).primaryColor.red,
+              ),
+              actions: <Widget>[
+                new IconButton(
+                  tooltip: 'Search',
+                  icon: const Icon(
+                    Icons.search,
+                    size: 20.0,
+                  ),
+                  onPressed: () async {
+                    final int selected = await showSearch<int>(
+                      context: context,
+                      delegate: _delegate,
+                    );
+                    if (selected != null && selected != _lastIntegerSelected) {
+                      setState(() {
+                        _lastIntegerSelected = selected;
+                      });
+                    }
+                  },
+                ),
+                new IconButton(
+                  tooltip: 'More (not implemented)',
+                  icon: const Icon(
+                    Icons.more_vert,
+                    size: 18.0,
+                  ),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+            new SliverGrid(
+              gridDelegate: new SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 250.0,
+                mainAxisSpacing: 10.0,
+                crossAxisSpacing: 10.0,
+                childAspectRatio: 1.0,
+              ),
+              delegate: new SliverChildBuilderDelegate(
+                (context, index) {
+                  return new Container(
+                    height: 100.0,
+                    width: 50.0,
+                    alignment: Alignment.center,
+                    color: Colors.teal[100 * (index % 9)],
+                    child: new Column(
+                      children: <Widget>[
+                        Expanded(
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage:
+                                  AssetImage(widget.lstPollImages[index]),
+                              //backgroundColor: Colors.deepOrange,
+//                                child: new Text(widget.lstDocumentIds[index]
+//                                    .substring(0, 1)),
+                            ), //Icon(Icons.album),
+                            title: Text(widget.lstDocumentIds[index]),
+
+                            subtitle: Text(widget.lstDocumentIds[index]),
+                            onTap: () {
+                              //onLongPress: () {
+                              Navigator.of(context).push(
+                                new PageRouteBuilder(
+                                  pageBuilder: (_, __, ___) =>
+                                      new DisplayPollItems(
+                                          selectedDocumentId:
+                                              widget.lstDocumentIds[index]),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          //child: new Text('grid item $index'),
+                          child: new ButtonBar(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit, size: 20.0),
+                                onPressed: () {},
+                              ),
+                              IconButton(
+                                  icon: Icon(Icons.delete, size: 20.0),
+                                  onPressed: () {}),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                },
+                childCount: widget
+                    .lstDocumentIds.length, //widget.lstDocumentIds.length,
+              ),
+            ),
+          ];
+        },
+        body: Text(""),
+//        body: Padding(
+//          padding: const EdgeInsets.all(10.0),
+//          child: DisplayPolls(
+//            //documents: widget.documents,
+//            lstDocumentIds: widget.lstDocumentIds,
+//          ),
+//        ),
+      ),
+
+//      body: Padding(
+//        padding: const EdgeInsets.all(10.0),
+//        child: DisplayPolls(
+//          //documents: widget.documents,
+//          lstDocumentIds: widget.lstDocumentIds,
+//        ),
+//      ),
+//      drawer: new Drawer(
+//        child: new Column(
+//          children: <Widget>[
+//            const UserAccountsDrawerHeader(
+//              accountName: const Text('Zach Widget'),
+//              accountEmail: const Text('zach.widget@example.com'),
+//              currentAccountPicture: const CircleAvatar(
+//                backgroundImage: const AssetImage(
+//                  'shrine/vendors/zach.jpg',
+//                  package: 'flutter_gallery_assets',
+//                ),
+//              ),
+//              margin: EdgeInsets.zero,
+//            ),
+//            new MediaQuery.removePadding(
+//              context: context,
+//              // DrawerHeader consumes top MediaQuery padding.
+//              removeTop: true,
+//              child: const ListTile(
+//                leading: const Icon(Icons.payment),
+//                title: const Text('Placeholder'),
+//              ),
+//            ),
+//          ],
+//        ),
+//      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton.extended(
+        elevation: 4.0,
+        icon: const Icon(Icons.add),
+        label: const Text('Add Poll'),
+        onPressed: () {}, //_showDialog,
+      ),
+
+//      bottomNavigationBar: BottomNavigationBar(
+////          currentIndex: currentTab,
+//        onTap: (int index) {
+//          setState(() {
+////              currentTab = index;
+////              currentPage = pages[index];
+//          });
+//        },
+//        items: <BottomNavigationBarItem>[
+//          BottomNavigationBarItem(
+//            icon: Icon(Icons.home),
+//            title: Text('Home'),
+//          ),
+//          BottomNavigationBarItem(
+//            icon: Icon(Icons.settings),
+//            title: Text("Settings"),
+//          ),
+//        ],
+//      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    pollController.dispose();
+    super.dispose();
+  }
 
   void _handleSearchBegin() {
 //    Map<String, String> mapCounter = <String, String>{"Inc": "2", "Dec": "-5"};
@@ -83,86 +334,12 @@ class _PollContainerState extends State<PollContainer> {
     super.initState();
   }
 
-  onPollchnaged() {
-    widget.documents.map((DocumentSnapshot docSnapshot) {
-      if (docSnapshot.exists) {
-        widget.lstDocumentIds.add(docSnapshot.documentID);
-      }
-    }).toList();
-  }
-
-//  _fetch() {
-////    widget.documents.map((DocumentSnapshot docSnapshot) {
-////      if (docSnapshot.exists) {
-////        widget.lstDocumentIds.add(docSnapshot.documentID);
-////      }
-////    }).toList();
-////    widget.lstDocumentIds.removeAt(1);
-////    widget.lstDocumentIds.removeAt(1);
-////    widget.lstDocumentIds.removeAt(1);
-////    widget.lstDocumentIds.removeAt(1);
-//    Polls polls;
-//    if (widget.lstDocumentIds != null) {
-//      widget.lstDocumentIds.forEach((docId) {
-//        if (pollDocumentId == null) pollDocumentId = docId;
-////        print(
-////            "------------------------------------------------------------- #### Jabsdkjf K 1 #### -------------------${docId}");
-//        Firestore.instance.collection(docId).getDocuments().then((docs) {
-//          lstPollItems = new List<PollItem>();
-//          docs.documents.forEach((DocumentSnapshot docSnapshot) {
-//            if (docSnapshot.exists) {
-////              print("--- #### NJK 0 #### -----${docSnapshot.documentID} ");
-////              print("--- #### NJK 3 #### -----${docSnapshot.data['name']} " +
-////                  " --- " +
-////                  "${docSnapshot.data['inc']} " +
-////                  " --- " +
-////                  "${docSnapshot.data['dec']} ");
-//              lstPollItems.add(new PollItem(
-//                  docId,
-//                  docSnapshot.documentID,
-//                  docSnapshot.data['name'],
-//                  docSnapshot.data['inc'],
-//                  docSnapshot.data['dec'],
-//                  docSnapshot));
-//
-//              polls =
-//                  new Polls(docId, docSnapshot.documentID, lstPollItems, docId);
-//            }
-//          });
-//        });
-//        lstPolls.add(polls);
-//      });
-//    }
-////    else
-////      print(
-////          "------------------------------------------------------------- ------------------------------------------------------------- #### NULL #### -------------------------------------------------------------------------------- ");
-//  }
-//  _fetchSelectedPollItems(String selectedPoll) {
-//    print(
-//        "------------------------------------------------------------- #### Jabsdkjf K 1 #### -------------------${selectedPoll}");
-//    Polls polls;
-//    Firestore.instance.collection(selectedPoll).getDocuments().then((docs) {
-//      docs.documents.forEach((DocumentSnapshot docSnapshot) {
-//        if (docSnapshot.exists) {
-//          print("--- #### JVK 0 #### -----${docSnapshot.documentID} ");
-//          print("--- #### JVK 3 #### -----${docSnapshot.data['name']} " +
-//              " --- " +
-//              "${docSnapshot.data['inc']} " +
-//              " --- " +
-//              "${docSnapshot.data['dec']} ");
-//          widget.lstPollItems.add(new PollItem(
-//              selectedPoll,
-//              docSnapshot.documentID,
-//              docSnapshot.data['name'],
-//              docSnapshot.data['inc'],
-//              docSnapshot.data['dec'],
-//              docSnapshot));
-//
-//          polls = new Polls(selectedPoll, lstPollItems, selectedPoll);
-//        }
-//      });
-//    });
-//    lstPolls.add(polls);
+//  onPollchnaged() {
+//    widget.documents.map((DocumentSnapshot docSnapshot) {
+//      if (docSnapshot.exists) {
+//        widget.lstDocumentIds.add(docSnapshot.documentID);
+//      }
+//    }).toList();
 //  }
 
   _navigateAndDisplayDropDown(BuildContext context) async {
@@ -181,136 +358,6 @@ class _PollContainerState extends State<PollContainer> {
 //    _fetchSelectedPollItems(result);
   }
 
-  int _lastIntegerSelected;
-
-  @override
-  Widget build(BuildContext context) {
-//    print(
-//        "------------------------------------------------------------- #### Jabsdkjf K 123 #### -------------------${widget.lstPolls.elementAt(0).name}");
-    return new Scaffold(
-      key: _scaffoldKey,
-      appBar: new AppBar(
-        leading: new IconButton(
-          tooltip: 'Navigation menu',
-          icon: new AnimatedIcon(
-            icon: AnimatedIcons.menu_arrow,
-            size: 20.0,
-            color: Colors.white,
-            progress: _delegate.transitionAnimation,
-          ),
-          onPressed: () {
-            _scaffoldKey.currentState.openDrawer();
-          },
-        ),
-        title: const Text('Best of Everything'),
-        actions: <Widget>[
-          new IconButton(
-            tooltip: 'Search',
-            icon: const Icon(
-              Icons.search,
-              size: 20.0,
-            ),
-            onPressed: () async {
-              final int selected = await showSearch<int>(
-                context: context,
-                delegate: _delegate,
-              );
-              if (selected != null && selected != _lastIntegerSelected) {
-                setState(() {
-                  _lastIntegerSelected = selected;
-                });
-              }
-            },
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.settings,
-              size: 18.0,
-            ),
-            onPressed: _handleSearchBegin,
-            tooltip: 'Search',
-          ),
-          IconButton(
-            tooltip: 'More (not implemented)',
-            icon: const Icon(
-              Icons.more_vert,
-              size: 18.0,
-            ),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-//        child: new Column(
-//          children: widget.lstPolls
-//              .map((doc) => PollListElement(pollDocumentId: doc.name))
-//              .toList(),
-//        ),
-
-        child: DisplayPolls(
-          //documents: widget.documents,
-          lstDocumentIds: widget.lstDocumentIds,
-        ),
-//        child: DisplayPollItems(
-//            documents: widget.documents,
-//            lstDocumentIds: widget.lstDocumentIds,
-//            lstPollItems: widget.lstPollItems),
-      ),
-      drawer: new Drawer(
-        child: new Column(
-          children: <Widget>[
-            const UserAccountsDrawerHeader(
-              accountName: const Text('Zach Widget'),
-              accountEmail: const Text('zach.widget@example.com'),
-              currentAccountPicture: const CircleAvatar(
-                backgroundImage: const AssetImage(
-                  'shrine/vendors/zach.jpg',
-                  package: 'flutter_gallery_assets',
-                ),
-              ),
-              margin: EdgeInsets.zero,
-            ),
-            new MediaQuery.removePadding(
-              context: context,
-              // DrawerHeader consumes top MediaQuery padding.
-              removeTop: true,
-              child: const ListTile(
-                leading: const Icon(Icons.payment),
-                title: const Text('Placeholder'),
-              ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton.extended(
-        elevation: 4.0,
-        icon: const Icon(Icons.add),
-        label: const Text('Add Poll'),
-        onPressed: _showDialog,
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: new Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.menu,
-              ),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {},
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   _showDialog() async {
     await showDialog<String>(
       context: context,
@@ -325,8 +372,7 @@ class _PollContainerState extends State<PollContainer> {
                     controller: pollController,
                     autofocus: true,
                     decoration: new InputDecoration(
-                        labelText: 'Add Poll Item',
-                        hintText: 'eg. Butter milk'),
+                        labelText: 'Add Poll Item', hintText: 'add an Item'),
                   ),
                 )
               ],
@@ -369,7 +415,7 @@ class _PollContainerState extends State<PollContainer> {
               child: const Text('Add'),
               onPressed: () {
                 setState(() {
-                  polls = new Polls("", "");
+                  polls = new Polls("", "", "", "");
                   print(
                       "-${pollController.text}----------------- #### -6- #### -------------------");
                 });
@@ -382,8 +428,6 @@ class _PollContainerState extends State<PollContainer> {
   }
 
   onAddPoll() {
-    print(
-        "------------------------------------------------------------- #### JK Poll 2#### ------------------");
     CollectionReference collReference =
         Firestore.instance.collection(pollController.text);
     CollectionReference pollCollReference =
@@ -402,10 +446,9 @@ class _PollContainerState extends State<PollContainer> {
         showOverlay(context, '+1', Colors.red);
         print("Poll adding Failed ${error}");
       });
-      
-    await transaction.set(
-        collReference.document(pollController.text), ;
-    );  
+
+//      await transaction.set(
+//          collReference.document(pollController.text), pollController.text)
     });
   }
 
@@ -431,9 +474,11 @@ class _PollContainerState extends State<PollContainer> {
 }
 
 class _SearchBarSearchDelegate extends SearchDelegate<int> {
+  List<String> history;
+  List<String> lstDocumentIds;
+
   final List<int> _data =
       new List<int>.generate(100001, (int i) => i).reversed.toList();
-  final List<int> _history = <int>[42607, 85604, 66374, 44, 174];
 
   @override
   Widget buildLeading(BuildContext context) {
@@ -453,7 +498,7 @@ class _SearchBarSearchDelegate extends SearchDelegate<int> {
   @override
   Widget buildSuggestions(BuildContext context) {
     final Iterable<int> suggestions = query.isEmpty
-        ? _history
+        ? history
         : _data.where((int i) => '$i'.startsWith(query));
 
     return new _SuggestionList(

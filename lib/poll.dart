@@ -20,5 +20,13 @@ class Polls {
 //  String subCategory;
 //  String createdBy;
 //  DateTime createdOn;
-  Polls(this.pollId, this.name);
+  String image;
+  Polls(this.pollId, this.name, this.category, this.image);
+
+  List<Polls> lstPolls = [
+    Polls("1", "Mars", "Milkyway Galaxy", "assets/img/mars.png"),
+    Polls("2", "Neptune", "Milkyway Galaxy", "assets/img/neptune.png"),
+    Polls("3", "Moon", "Milkyway Galaxy", "assets/img/moon.png"),
+    Polls("4", "Earth", "Milkyway Galaxy", "assets/img/earth.png"),
+  ];
 }

@@ -72,11 +72,12 @@ class DisplayPolls extends StatelessWidget {
                   ),
                   onTap: () {
                     Navigator.of(context).push(
-                          new PageRouteBuilder(
-                            pageBuilder: (_, __, ___) =>
-                                new DisplayPollItems(selectedDocumentId: poll),
-                          ),
-                        );
+                      new PageRouteBuilder(
+                        pageBuilder: (context, __, ___) =>
+                            DisplayPollItems(selectedDocumentId: poll),
+                        maintainState: true,
+                      ),
+                    );
                   },
                 );
               }).toList());
